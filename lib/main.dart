@@ -4,96 +4,106 @@ import 'package:provider/provider.dart';
 void main() {
   runApp(
     ChangeNotifierProvider(
-      create: (context) => CounterProvider(), // khai báo nhà cung cấp store
+      create: (context) => MySetting(), // khai báo nhà cung cấp store
       child: const MaterialApp(
-        home: HomeScreen(),
+        home: MyApp(),
       ),
     ),
   );
 }
 
 // nhà cung cấp store
-class CounterProvider extends ChangeNotifier {
-  int _counter = 10; // khởi tạo state
-  int get counter => _counter;
-  void add() {
-    _counter++;
-    notifyListeners(); // thông bao sự thay đổi của provider ( chổ nào cần thay đổi data thì thêm hàm này vào)
+class MySetting extends ChangeNotifier {
+  String text = 'Dosne';
+  Color color = Colors.red;
+  void changeText() {
+    if (text == 'HELLO') {
+      text = 'WORLD';
+    } else {
+      text = 'HELLO';
+    }
+    notifyListeners();
+  }
+
+  void changeColor() {
+    if (color == Colors.red) {
+      color = Colors.blue;
+    } else {
+      color = Colors.red;
+    }
+    notifyListeners();
   }
 }
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home screen'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              context.watch<CounterProvider>().counter.toString(),
-              style: const TextStyle(fontSize: 50),
+    return Consumer<MySetting>(
+      builder: (context, mySettingStore, child) {
+        return Scaffold(
+          drawer: Drawer(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        mySettingStore.changeText();
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Change text'),
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        mySettingStore.changeColor();
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Change color'),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (_) => SecondScreen()));
-              },
-              child: const Text('Go to second Screen'),
-            )
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.read<CounterProvider>().add();
-        },
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
-}
-
-//SecondScreen
-
-class SecondScreen extends StatelessWidget {
-  const SecondScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Second screen'),
-        backgroundColor: Colors.pink,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              context.watch<CounterProvider>().counter.toString(),
-              style: const TextStyle(fontSize: 50),
+          ),
+          appBar: AppBar(
+            title: const Text("provider demo"),
+            backgroundColor: mySettingStore.color,
+          ),
+          body: Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    mySettingStore.changeText();
+                  },
+                  child: const Text('Change text'),
+                ),
+                Container(
+                  padding: EdgeInsets.all(10),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      mySettingStore.changeColor();
+                    },
+                    child: const Text('Change color'),
+                  ),
+                ),
+                Text(
+                  mySettingStore.text,
+                  style: TextStyle(color: mySettingStore.color),
+                ),
+              ],
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Go to home Screen'),
-            )
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.read<CounterProvider>().add();
-        },
-        child: const Icon(Icons.add),
-      ),
+          ),
+        );
+      },
     );
   }
 }
