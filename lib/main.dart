@@ -5,7 +5,9 @@ void main() {
   runApp(
     ChangeNotifierProvider(
       create: (context) => CounterProvider(), // khai báo nhà cung cấp store
-      child: const MyApp(),
+      child: const MaterialApp(
+        home: HomeScreen(),
+      ),
     ),
   );
 }
@@ -20,31 +22,77 @@ class CounterProvider extends ChangeNotifier {
   }
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'state management',
-      home: Scaffold(
-        body: Center(
-          child: Text(
-            context
-                .watch<CounterProvider>()
-                .counter
-                .toString(), // theo dõi sự kiện và render từ provider
-            style: const TextStyle(
-              fontSize: 50,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Home screen'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              context.watch<CounterProvider>().counter.toString(),
+              style: const TextStyle(fontSize: 50),
             ),
-          ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (_) => SecondScreen()));
+              },
+              child: const Text('Go to second Screen'),
+            )
+          ],
         ),
-        floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.add),
-          onPressed: () {
-            context.read<CounterProvider>().add(); // bắt sự kiện cho provider
-          },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          context.read<CounterProvider>().add();
+        },
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+//SecondScreen
+
+class SecondScreen extends StatelessWidget {
+  const SecondScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Second screen'),
+        backgroundColor: Colors.pink,
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              context.watch<CounterProvider>().counter.toString(),
+              style: const TextStyle(fontSize: 50),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Go to home Screen'),
+            )
+          ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          context.read<CounterProvider>().add();
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }
